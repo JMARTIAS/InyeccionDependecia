@@ -1,5 +1,5 @@
 # Inyección de dependencias Dagger Hilt
-para iniciar un proyecto con dagger hilt hay que implementar unas dependencias, estas son las de Hilt e incluyen las que son de Dagger 
+para iniciar un proyecto con dagger hilt hay que implementar unas dependencias, estas son las de Hilt e incluyen las que son de Dagger, las saqué de https://dagger.dev/hilt/gradle-setup
 ```gradle
  //Dagger - Hilt
     implementation "com.google.dagger:hilt-android:2.42"
