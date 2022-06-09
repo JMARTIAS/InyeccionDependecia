@@ -1,12 +1,9 @@
 # Inyección de dependencias Dagger Hilt
-para iniciar un proyecto con dagger hilt hay que implementar unas dependencias 
+para iniciar un proyecto con dagger hilt hay que implementar unas dependencias, estas son las de Hilt e incluyen las que son de Dagger 
 ```gradle
  //Dagger - Hilt
-    implementation "com.google.dagger:hilt-android:2.28-alpha"
-    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
-
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02"
-    kapt "androidx.hilt:hilt-compiler:1.0.0-alpha02"
+    implementation "com.google.dagger:hilt-android:2.42"
+    kapt "com.google.dagger:hilt-compiler:2.42"
 ```
 
 tambien se debe poner en plugins (un poco mas arriba)
@@ -18,7 +15,7 @@ id 'dagger.hilt.android.plugin'
 
 también en el gradle del proyecto hay que poner este classpath para no tener problemas con 
 ```gradle
-classpath "com.google.dagger:hilt-android-gradle-plugin:2.28.3-alpha"
+classpath "com.google.dagger:hilt-android-gradle-plugin:2.42"
 ```
 despues se hace el sync now
 
@@ -50,7 +47,7 @@ tambien hay que declarar esta clase en el manifest
   Con Dagger hilt podemos hacer un scope de nuestras dependencias, se puede crear un modulo que solo viva lo que vive una actividad 
   
   entonces creamos nuestro objeto y le ponemos la anotacion @Module y  tenemos que decirle 
-  cual es el scope que queremos en que viva que se hace con @InstallIn(ApplicationComponent::class), que dice que viven 
+  cual es el scope que queremos en que viva que se hace con @InstallIn(SingletonComponent::class), que dice que viven 
   mientras viva la app 
   tb hay ActivityComponent, que hace que las dependencias vivan mientras viva esta activity,
   hay FragmentComponent
@@ -65,7 +62,7 @@ tambien hay que declarar esta clase en el manifest
   La otra anotacion es @Provides
   ```kotlin
   @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
     @Singleton
@@ -172,3 +169,39 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
+aca un ejemplo de Module
+
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+class AlbumModule {
+    @Provides
+    @Singleton
+    fun provideRetrofitApi(): PhotoAlbumAPI {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(PhotoAlbumAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAlbumUseCase(repository: AlbumRepository): GetAlbumUseCase {
+        return GetAlbumUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAlbumRepository(dataSource: AlbumRemoteDataSource): AlbumRepository{
+        return AlbumRepositoryImpl(dataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlbumRemoteDataSource(api: PhotoAlbumAPI): AlbumRemoteDataSource{
+        return AlbumRemoteDataSource(api)
+    }
+
+}
+```
